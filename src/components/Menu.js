@@ -9,6 +9,9 @@ const Menu = () => {
       <li>
         <Link to='/red'>Red</Link>
       </li>
+      <li>
+        <Link to='/users'>Users</Link>
+      </li>
     </ul>
   );
 };
