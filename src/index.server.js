@@ -20,7 +20,7 @@ const chunks = Object.keys(manifest.files)
   .map(key => `<script src="${manifest['files'][key]}"></script>`) // 스크립트 태그로 변환
   .join('');
 
-function createPage(root) {
+function createPage(root, staticScript) {
   return `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -36,6 +36,7 @@ function createPage(root) {
     <div id="root">
       ${root}
     </div>
+    ${staticScript}
     <script src="${manifest['files']['runtime-main.js']}"></script>
     ${chunks}
     <script src="${manifest['files']['main.js']}"></script>
@@ -75,7 +76,9 @@ const serverRender = async (req, res, next) => {
   }
   preloadContext.done = true;
   const root = ReactDOMServer.renderToString(jsx);
-  res.send(createPage(root));
+  const stateString = JSON.stringify(store.getState()).replace(/</g, '\\u003c');
+  const stateScript = `<script>__PRELOADED_STATE__ = ${stateString}</script>`;
+  res.send(createPage(root, stateScript));
 };
 
 const serve = express.static(path.resolve('./build'), {
